@@ -35,6 +35,11 @@ Elemento* criaElemento(int);
 ListaHash* criaListaHash();
 void criaHash(ListaHash*);
 void insereListaHash(ListaHash*,int);
+Lista* retornaLista(ListaHash* ,int);
+void insereElementoHash(ListaHash* ,int ,int);
+void percorreListaHash (ListaHash*,int);
+Elemento* encontraNodo(Lista*, int);
+void removerElementoHash (ListaHash*,int,int);
 int insereElementoNaLista(Lista*, Elemento*, int);
 int removeElementoDaLista(Lista*, Elemento*);
 void percorreLista(Lista*);
@@ -76,6 +81,7 @@ Elemento* criaElemento(int dado){
     }  
     return nodo;
 }
+// ------------- Implementando a tabela Hash com l.e.d. ---------//
 
 //função cria uma lista de listas e desloca memória para ela
 ListaHash* criaListaHash(){
@@ -100,6 +106,7 @@ void criaHash(ListaHash* listaHash){
   }
 }
 
+//insere as listas encadeadas na tabela Hash
 void insereListaHash(ListaHash* listaHash,int key){
   Lista* novaLista = criaLista(key);
 
@@ -144,6 +151,59 @@ int insereElementoNaLista(Lista* lista, Elemento* pivo, int dado){
   
   lista->size++;
   return 0;
+}
+
+//insere elementos na tabela hash
+void insereElementoHash(ListaHash* listahash,int key,int dado){
+  Lista* lista = retornaLista(listahash, key);
+  
+  insereElementoNaLista(lista,lista->tail,dado);
+  
+}
+
+void percorreListaHash (ListaHash* listahash,int key){
+  Lista* lista = retornaLista(listahash, key);
+  percorreLista(lista);
+}
+
+void removerElementoHash (ListaHash* listahash,int key,int dado){
+  Lista* lista = retornaLista(listahash, key);
+  Elemento* nodo = encontraNodo(lista,dado);
+
+  if(nodo != NULL){
+    removeElementoDaLista(lista, nodo);
+  }else{
+    printf("Nodo não encontrado");
+  }
+  
+}
+
+void quantidadeElementosHash(ListaHash* listaHash){
+
+  
+}
+
+Elemento* encontraNodo(Lista* lista, int dado){
+  Elemento* aux;
+    aux = lista->head;
+    
+    while(aux != NULL){
+        if(aux->dado == dado){
+          return aux;
+        }
+        aux = aux->next;
+    }
+}
+
+Lista* retornaLista(ListaHash* listahash,int key){
+  Lista* lista = listahash->head;
+  int i;
+  for(i = 0; i < TAM; i++){
+    if(key == lista->key){
+      return lista;
+    }
+    lista = lista->next;
+  }
 }
 
 //função de remover elementos da lista
@@ -199,6 +259,7 @@ void percorreLista(Lista* lista){
     }
 }
 
+
 //percorre a lista no sentido tail->head
 void percorreListaNoOutroSentido(Lista* lista){
     Elemento* aux;
@@ -231,7 +292,7 @@ Elemento* pesquisaNaLista(Lista* lista, int dado){
 
 
 
-// ------ Implementando a tabela Hash com l.e.d. ------//
+
 
 
 
@@ -241,8 +302,22 @@ int main(void) {
   printf("Hello World\n");
   ListaHash* listaHash = criaListaHash();
   criaHash(listaHash);
-  printf("Hello World\n");
 
+  insereElementoHash(listaHash ,25 ,78);
+  insereElementoHash(listaHash ,25 ,38);
+  insereElementoHash(listaHash ,25 ,79);
+  insereElementoHash(listaHash ,25 ,45);
+  insereElementoHash(listaHash ,25 ,78);
+  insereElementoHash(listaHash ,25 ,36);
+  insereElementoHash(listaHash ,25 ,89);
+  insereElementoHash (listaHash ,25 ,12);
+  
+  percorreListaHash (listaHash,25);
+
+  removerElementoHash(listaHash,25,36);
+  printf("nhaaaaaaa\n\n");
+
+  percorreListaHash (listaHash,25);
   
   
   return 0;
