@@ -9,7 +9,7 @@
 typedef struct sElemento{
     struct sElemento *next;
     struct sElemento *prev;
-    int dado; 
+    char dado[50]; 
 } Elemento;
 
 //Representação de Lista encadeada Dupla, mesma coisa que a simples
@@ -31,24 +31,32 @@ typedef struct listaHash{
 
 //Prototipação
 Lista* criaLista(int);
-Elemento* criaElemento(int);
+Elemento* criaElemento(char*);
 ListaHash* criaListaHash();
 void criaHash(ListaHash*);
 void insereListaHash(ListaHash*,int);
 Lista* retornaLista(ListaHash* ,int);
-void insereElementoHash(ListaHash* ,int ,int);
+void insereElementoHash(ListaHash* ,int ,char*);
 void percorreListaHash (ListaHash*,int);
-Elemento* encontraNodo(Lista*, int);
-void removerElementoHash (ListaHash*,int,int);
-int insereElementoNaLista(Lista*, Elemento*, int);
-int removeElementoDaLista(Lista*, Elemento*);
+Elemento* encontraNodo(Lista*, char*);
+void removerElementoHash (ListaHash*,int,char*);
+void quantidadeElementosHash(ListaHash* );
+int insereElementoNaLista(Lista*, Elemento*, char*);
+char* removeElementoDaLista(Lista*, Elemento*);
 void percorreLista(Lista*);
 void percorreListaNoOutroSentido(Lista*);
 void limpaLista(Lista*);
-Elemento* pesquisaNaLista(Lista*, int);
+Elemento* pesquisaNaLista(Lista*, char*);
+int tabelaHash(char* dado);
+void insereArquivoTXT(ListaHash*,FILE* );
+void pesquisaNome(ListaHash* ,char* );
+void troca (Elemento*, Elemento*);
+Elemento* ultimoNodo(ListaHash* listaHash, int key);
+Elemento* separa(Elemento* ,Elemento* );
+void quickSort(Elemento*, Elemento*);
+void ordenaLista(ListaHash*, int);
 
-
-// ------ Importando funções da lista encadeada dupla ------//
+// ------------ Importando funções da lista encadeada dupla -----------//
 
 //função cria lista e desloca memória para ela
 Lista* criaLista(int key){
@@ -69,7 +77,7 @@ Lista* criaLista(int key){
 }
 
 // função cria elemento e desloca memória para ele
-Elemento* criaElemento(int dado){
+Elemento* criaElemento(char* dado){
     Elemento* nodo;
     nodo = (Elemento*) malloc(sizeof(Elemento));
     if (nodo == NULL)
@@ -77,11 +85,13 @@ Elemento* criaElemento(int dado){
     else {
         nodo->next = NULL;
         nodo->prev = NULL;
-        nodo->dado = dado;
+        strcpy(nodo->dado,dado);
+        //nodo->dado = dado;
     }  
     return nodo;
 }
-// ------------- Implementando a tabela Hash com l.e.d. ---------//
+
+// ---------------- Implementando a tabela Hash com l.e.d. ---------------//
 
 //função cria uma lista de listas e desloca memória para ela
 ListaHash* criaListaHash(){
@@ -124,7 +134,7 @@ void insereListaHash(ListaHash* listaHash,int key){
 }
 
 //função insere elementos na lista dupla
-int insereElementoNaLista(Lista* lista, Elemento* pivo, int dado){  
+int insereElementoNaLista(Lista* lista, Elemento* pivo, char* dado){  
   Elemento* novo = criaElemento(dado);
 
   if(pivo == NULL && lista->size != 0){
@@ -154,19 +164,21 @@ int insereElementoNaLista(Lista* lista, Elemento* pivo, int dado){
 }
 
 //insere elementos na tabela hash
-void insereElementoHash(ListaHash* listahash,int key,int dado){
+void insereElementoHash(ListaHash* listahash,int key,char* dado){
   Lista* lista = retornaLista(listahash, key);
   
   insereElementoNaLista(lista,lista->tail,dado);
   
 }
 
+//imprime os elementos de uma lista especifica
 void percorreListaHash (ListaHash* listahash,int key){
   Lista* lista = retornaLista(listahash, key);
   percorreLista(lista);
 }
 
-void removerElementoHash (ListaHash* listahash,int key,int dado){
+//remove um elemento especifico de uma lista especifica
+void removerElementoHash (ListaHash* listahash,int key, char* dado){
   Lista* lista = retornaLista(listahash, key);
   Elemento* nodo = encontraNodo(lista,dado);
 
@@ -178,17 +190,24 @@ void removerElementoHash (ListaHash* listahash,int key,int dado){
   
 }
 
+//retorna a quantidade de nomes em uma lista/chave
 void quantidadeElementosHash(ListaHash* listaHash){
-
+  Lista* aux;
+    aux = listaHash->head;
+    
+    while(aux != NULL){
+        printf("%i\n", aux->size);
+        aux = aux->next;
+    }
   
 }
 
-Elemento* encontraNodo(Lista* lista, int dado){
+Elemento* encontraNodo(Lista* lista, char* dado){
   Elemento* aux;
     aux = lista->head;
     
     while(aux != NULL){
-        if(aux->dado == dado){
+        if(strcmp(aux->dado,dado) == 0){
           return aux;
         }
         aux = aux->next;
@@ -207,8 +226,10 @@ Lista* retornaLista(ListaHash* listahash,int key){
 }
 
 //função de remover elementos da lista
-int removeElementoDaLista(Lista* lista, Elemento* aux){
-  int dado;
+char* removeElementoDaLista(Lista* lista, Elemento* aux){
+  char dado[50];
+  //char* dado ="aa\0";
+  
   if(aux!= NULL && lista->size != 0){
     if(aux == lista->head){
       lista->head = aux->next;
@@ -230,12 +251,16 @@ int removeElementoDaLista(Lista* lista, Elemento* aux){
         aux->next->prev = aux->prev;
       }
     }
-    dado = aux->dado;
+    //dado = aux->dado;
+    //strncpy(dado,aux->dado, string);
+    
+    strcpy(dado,aux->dado);
     free(aux);
     lista->size++;
-    return dado;         
+    return *dado;         
   } else {
-     return printf("Auxiliar é nulo ou número não existe na lista");  //caso não consiga remover
+    printf("Auxiliar é nulo ou número não existe na lista");
+     //caso não consiga remover
   } 
 }
 
@@ -254,7 +279,7 @@ void percorreLista(Lista* lista){
     aux = lista->head;
     
     while(aux != NULL){
-        printf("%i, ", aux->dado);
+        printf("%s\n", aux->dado);
         aux = aux->next;
     }
 }
@@ -266,17 +291,18 @@ void percorreListaNoOutroSentido(Lista* lista){
     aux = lista->tail;
     
     while(aux != NULL){
-        printf(" %i, ", aux->dado);
+        printf(" %s, ", aux->dado);
         aux = aux->prev;
     }
 }
 
 //percorre a lista para encontrar um elemento especifico
-Elemento* pesquisaNaLista(Lista* lista, int dado){
+Elemento* pesquisaNaLista(Lista* lista, char* dado){
     Elemento* aux;
     aux = lista->head; 
     while(aux != NULL){
-        if (aux->dado == dado){
+        if (strcmp(aux->dado, dado) == 0){
+          
             return aux;
         }
         aux = aux->next;
@@ -286,39 +312,152 @@ Elemento* pesquisaNaLista(Lista* lista, int dado){
 
 
 
+void insereArquivoTXT(ListaHash* listaHash,FILE* file){
+	
+	char  string[50];
+	char  *aux;
+											
+	do{
+		fscanf(file,"%s",string);
+		//aux = incrementaString(string);		
+					
+		//insereNodo(lista,string,indicaPosicao(aux));
+    insereElementoHash(listaHash ,tabelaHash(string) ,string);
+			
+	}while(fgets(string,50,file) != NULL);	
+}
 
-// ------ Implementando o Quicksort com l.e.d. ------//
+int tabelaHash(char* dado){
+  int	i;
+	float hash = 0;
+	
+	for(i = 0;i<strlen(dado);i++)
+		hash = 3 * hash + (int)dado[i];
+	
+	return (int)hash % TAM;
+}
+
+void pesquisaNome(ListaHash* listaHash,char* dado){
+
+  int key = tabelaHash(dado);
+
+  Lista* lista = retornaLista(listaHash, key);
+  Elemento* nodo = encontraNodo(lista,dado);
+
+  if(nodo != NULL){
+    printf("Nome encontrado na lista %i\n",lista->key);
+  }else{
+    printf("Nodo não encontrado");
+  }
+}
+
+
+// --------------- Implementando o Quicksort com l.e.d. ---------------//
+
+
+void troca (Elemento* a, Elemento* b){
+  char  aux[50];
+	
+	strcpy(aux,a->dado);
+	strcpy(a->dado,b->dado);									
+	strcpy(b->dado,aux);
+}
+
+
+Elemento* ultimoNodo(ListaHash* listaHash, int key){
+
+  Lista* lista = retornaLista(listaHash, key);
+  Elemento* aux = lista->head;
+  
+  
+  while(aux && aux->next){
+    aux = aux->next;
+  }
+  quickSort(lista->head, aux);
+}
+
+Elemento* separa(Elemento* l,Elemento* h){
+  //char aux[50];
+
+  Elemento* i = l->prev;
+  Elemento* j;
+
+  for(j = l; j != h; j = j->next ){
+    if(strcmp(j->dado,h->dado)<= 0){
+      i = (i == NULL) ? l : i->next;
+      troca(i, j);
+    }
+  }
+
+  i = (i == NULL) ? l : i->next;
+/*
+  if(i == NULL){
+    i = l;
+  }else{
+    i = i->next;
+  }*/
+
+  
+  troca(i, h);
+  return i;
+}
+
+/* Considera o último elemento como pivo e coloca esse elemento-pivo no lugar correto da lista, e coloca dos os elementos menores que o pivo na esquerda e os maiores na direita */
+
+void quickSort(Elemento* l, Elemento* h){
+  Elemento* aux;
+
+  if(h != NULL && l != h && h->next != l){
+    aux = separa(l,h);
+    quickSort(l, aux->prev);
+    quickSort(aux->next, h);
+  }
+}
 
 
 
-
-
-
-
+void ordenaLista(ListaHash* listaHash, int key){
+  
+  Lista* lista = retornaLista(listaHash, key);
+  Elemento* nodo = lista->tail;
+  quickSort(lista->head, nodo);
+}
 
 
 
 int main(void) {
+  
   printf("Hello World\n");
   ListaHash* listaHash = criaListaHash();
   criaHash(listaHash);
 
-  insereElementoHash(listaHash ,25 ,78);
-  insereElementoHash(listaHash ,25 ,38);
-  insereElementoHash(listaHash ,25 ,79);
-  insereElementoHash(listaHash ,25 ,45);
-  insereElementoHash(listaHash ,25 ,78);
-  insereElementoHash(listaHash ,25 ,36);
-  insereElementoHash(listaHash ,25 ,89);
-  insereElementoHash (listaHash ,25 ,12);
-  
-  percorreListaHash (listaHash,25);
+  FILE *file = fopen("nomes.txt", "r"); 
 
-  removerElementoHash(listaHash,25,36);
+  insereArquivoTXT(listaHash,file);
+    
+  /*insereElementoHash(listaHash ,25 ,"gfdg");
+  insereElementoHash(listaHash ,25 ,"ggggg");
+  insereElementoHash(listaHash ,25 ,"fggg");
+  insereElementoHash(listaHash ,25 ,"aaaaa");
+  insereElementoHash(listaHash ,25 ,"nhaaa");
+  insereElementoHash(listaHash ,25 ,"fggfh");
+  insereElementoHash(listaHash ,25 ,"rrrr");
+  insereElementoHash (listaHash,25 ,"gfdgd");*/
+  
+  //percorreListaHash (listaHash,25);
+  //removerElementoHash(listaHash,25,"aaaaa");
   printf("nhaaaaaaa\n\n");
 
-  percorreListaHash (listaHash,25);
+  //percorreListaHash (listaHash,25);
   
+  //quantidadeElementosHash(listaHash);
+  pesquisaNome(listaHash,"TIAGO");
+
   
+  ordenaLista(listaHash, 6);
+  //percorreListaHash (listaHash,6);
+
+  //removerElementoHash(listaHash,6,"TIAGO");
+  //percorreListaHash (listaHash,6);
   return 0;
 }
