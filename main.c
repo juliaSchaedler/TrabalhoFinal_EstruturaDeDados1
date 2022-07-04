@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#define TAM 53
 //Fazer uma tabela hash onde os indices estão numa lista encadeada e cada indice leva para uma outra lista encadeada, que deve ser utilizada para a ordenação o quicksort, que leva ponteiros nos lugar de vetores
 
 
@@ -13,15 +13,28 @@ typedef struct sElemento{
 } Elemento;
 
 //Representação de Lista encadeada Dupla, mesma coisa que a simples
-typedef struct {
+typedef struct sLista{
     Elemento *head;
     Elemento *tail;
+    struct sLista *next;
+    struct sLista *prev;
     int size;
+    int key;
 } Lista;
 
+//LISTA DE LISTAS
+typedef struct listaHash{
+    Lista *head;
+    Lista *tail;
+    int size;
+} ListaHash;
+
 //Prototipação
-Lista* criaLista();
+Lista* criaLista(int);
 Elemento* criaElemento(int);
+ListaHash* criaListaHash();
+void criaHash(ListaHash*);
+void insereListaHash(ListaHash*,int);
 int insereElementoNaLista(Lista*, Elemento*, int);
 int removeElementoDaLista(Lista*, Elemento*);
 void percorreLista(Lista*);
@@ -33,7 +46,7 @@ Elemento* pesquisaNaLista(Lista*, int);
 // ------ Importando funções da lista encadeada dupla ------//
 
 //função cria lista e desloca memória para ela
-Lista* criaLista(){
+Lista* criaLista(int key){
     Lista* lista;
     lista = (Lista*) malloc(sizeof(Lista));
     if (lista == NULL)
@@ -41,7 +54,10 @@ Lista* criaLista(){
     else {
         lista->head = NULL;
         lista->tail = NULL;
+        lista->next = NULL;
+        lista->prev = NULL;
         lista->size = 0;
+        lista->key = key;
     }
     
     return lista;
@@ -59,6 +75,45 @@ Elemento* criaElemento(int dado){
         nodo->dado = dado;
     }  
     return nodo;
+}
+
+//função cria uma lista de listas e desloca memória para ela
+ListaHash* criaListaHash(){
+    ListaHash* listaHash;
+    listaHash = (ListaHash*) malloc(sizeof(ListaHash));
+    if (listaHash == NULL)
+        return NULL;
+    else {
+        listaHash->head = NULL;
+        listaHash->tail = NULL;
+        listaHash->size = 0;
+    }
+    
+    return listaHash;
+}
+
+//função cria e inicializa a tabela Hash
+void criaHash(ListaHash* listaHash){
+  int i;
+  for(i =0 ;i < TAM; i++){
+      insereListaHash(listaHash,i);
+  }
+}
+
+void insereListaHash(ListaHash* listaHash,int key){
+  Lista* novaLista = criaLista(key);
+
+  if(novaLista != NULL){
+    if(listaHash->size == 0){
+      listaHash->head = novaLista;
+      listaHash->tail = novaLista;
+    }else{
+      listaHash->tail->next = novaLista;
+      novaLista->prev = listaHash->tail;
+      listaHash->tail = novaLista;
+    }
+    listaHash->size++;
+  }
 }
 
 //função insere elementos na lista dupla
@@ -158,8 +213,7 @@ void percorreListaNoOutroSentido(Lista* lista){
 //percorre a lista para encontrar um elemento especifico
 Elemento* pesquisaNaLista(Lista* lista, int dado){
     Elemento* aux;
-    aux = lista->head;
-    
+    aux = lista->head; 
     while(aux != NULL){
         if (aux->dado == dado){
             return aux;
@@ -174,10 +228,10 @@ Elemento* pesquisaNaLista(Lista* lista, int dado){
 
 // ------ Implementando o Quicksort com l.e.d. ------//
 
+
+
+
 // ------ Implementando a tabela Hash com l.e.d. ------//
-
-
-
 
 
 
@@ -185,5 +239,11 @@ Elemento* pesquisaNaLista(Lista* lista, int dado){
 
 int main(void) {
   printf("Hello World\n");
+  ListaHash* listaHash = criaListaHash();
+  criaHash(listaHash);
+  printf("Hello World\n");
+
+  
+  
   return 0;
 }
