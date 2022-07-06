@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define TAM 200 
+#define TAM 53 
 //COM TAM 53 o console não imprime tudo
 // Fazer uma tabela hash onde os indices estão numa lista encadeada e cada
 // indice leva para uma outra lista encadeada, que deve ser utilizada para a
@@ -255,7 +255,7 @@ char *removeElementoDaLista(Lista *lista, Elemento *aux) {
     strcpy(dado, aux->dado);
     free(aux);
     lista->size++;
-    return *dado;
+    return NULL;
   } else {
     printf("Auxiliar é nulo ou número não existe na lista");
     // caso não consiga remover
@@ -263,13 +263,13 @@ char *removeElementoDaLista(Lista *lista, Elemento *aux) {
 }
 
 // função limpa a lista e libera memória
-void limpaLista(Lista *lista) {
+/*void limpaLista(Lista *lista) {
   while (lista->head != NULL) {
     removeElementoDaLista(lista, lista->head); // função remove não aceita null
   }
 
   free(lista);
-}
+}*/
 
 // percorre a lista no sentido head->tail
 void percorreLista(Lista *lista) {
@@ -283,7 +283,7 @@ void percorreLista(Lista *lista) {
 }
 
 // percorre a lista no sentido tail->head
-void percorreListaNoOutroSentido(Lista *lista) {
+/*void percorreListaNoOutroSentido(Lista *lista) {
   Elemento *aux;
   aux = lista->tail;
 
@@ -291,7 +291,7 @@ void percorreListaNoOutroSentido(Lista *lista) {
     printf(" %s, ", aux->dado);
     aux = aux->prev;
   }
-}
+}*/
 
 // percorre a lista para encontrar um elemento especifico
 Elemento *pesquisaNaLista(Lista *lista, char *dado) {
@@ -322,6 +322,7 @@ void insereArquivoTXT(ListaHash *listaHash, FILE *file) {
   } while (fgets(string, 50, file) != NULL);
 }
 
+//faz a função hash
 int tabelaHash(char *dado) {
   int i;
   float hash = 0;
@@ -356,6 +357,7 @@ void troca(Elemento *a, Elemento *b) {
   strcpy(b->dado, aux);
 }
 
+//procura o ultimo elemento da lista e torna ele o pivo
 Elemento *ultimoNodo(ListaHash *listaHash, int key) {
 
   Lista *lista = retornaLista(listaHash, key);
@@ -365,8 +367,11 @@ Elemento *ultimoNodo(ListaHash *listaHash, int key) {
     aux = aux->next;
   }
   quickSort(lista->head, aux);
+
+  return aux;
 }
 
+//faz a separação das palavras em relação ao pivo, o i é responsável pelos valores menores e o j pelos maiores
 Elemento *separa(Elemento *l, Elemento *h) {
   // char aux[50];
 
@@ -436,12 +441,12 @@ int main(void) {
   // printf("nhaaaaaaa\n\n");
   // percorreListaHash (listaHash,25);
 
-  // quantidadeElementosHash(listaHash);
-   pesquisaNome(listaHash,"CARLOS");
-   //percorreListaHash(listaHash, 1);
+   //quantidadeElementosHash(listaHash);
+   //pesquisaNome(listaHash,"CARLOS");
+  //percorreListaHash(listaHash, 13);
 
-  ordenaLista(listaHash, 164);
-  percorreListaHash(listaHash, 164);
+  ordenaLista(listaHash, 13);
+  percorreListaHash(listaHash, 13);
 
   // removerElementoHash(listaHash,35,"JULIA");
   // percorreListaHash (listaHash,35);
